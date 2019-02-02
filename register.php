@@ -42,7 +42,7 @@
                     move_uploaded_file($tmp_name, $newpath);
                 }
                 try {
-                    $data_insert = 'INSERT INTO members(name, email, password, picture, created, modified ) VALUES (:nickname, :email, :password, :image, :date, :modified)';
+                    $data_insert = 'INSERT INTO members(name, email, password, picture, created) VALUES (:nickname, :email, :password, :image, :date)';
                     $stmt_insert = $pdo->prepare($data_insert);
                     $date = new Datetime();
                     $date = $date->format('Y-m-d H:i:s');
