@@ -52,7 +52,6 @@
                     $stmt_insert->bindParam(':password', $newpass, PDO::PARAM_STR);
                     $stmt_insert->bindParam(':image', $newpath, PDO::PARAM_STR);
                     $stmt_insert->bindValue(':date', $date, PDO::PARAM_STR);
-                    $stmt_insert->bindValue(':modified', $date, PDO::PARAM_STR);
                     $stmt_insert->execute();
                 } catch (Exception $e) {
                     $error = $e->getMessage();
