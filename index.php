@@ -7,11 +7,16 @@
         header('Location: login.php');
         exit();
     }
-    
-    $sql_post= "SELECT posts.id, posts.message, posts.modified, members.name, members.picture FROM posts, members WHERE posts.member_id = members.id AND posts.reply_post_id = 0 ORDER BY posts.modified DESC";
+    $p = isset($_GET['p']) ? intval($_GET['p']) : 0;
+    $limit = 5;
+    $v_page = $limit;
+    $offset = $p * $limit;
+    $sql_post= "SELECT posts.id, posts.message, posts.modified, members.name, members.picture FROM posts, members WHERE posts.member_id = members.id AND posts.reply_post_id = 0 ORDER BY posts.modified DESC LIMIT :limit OFFSET :offset";
     $stml_post= $pdo->prepare($sql_post);
+    $stml_post->bindValue(":limit", $v_page, PDO::PARAM_INT);
+    $stml_post->bindValue(":offset", $offset, PDO::PARAM_INT);
     $stml_post->execute();
-    
+    $count = $stml_post->rowCount();
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +35,7 @@
             <b><?php echo $_SESSION['login_name'] ?><?php $_SESSION['login_id'] ?></b>
             <a href="logout.php">ログアウト</a>
             <a href="user_update.php"> 情報変更</a>
-            <a href="user_delete.php" style="color:red; font-weight:bold;">退会</a>
+            <a href="user_delete.php" style="color:red; font-weight:bold;" onclick="return confirm('退会しますか？')">退会</a>
         </div>
         <div class="bbs_form">
             <p>メッセージ</p>
@@ -43,7 +48,7 @@
         <div class="message">
             <img src="<?php echo $row_post['picture'] ?>" width="30px" height="30px" />
             <b>@<?php echo $row_post['name'] ?>さん</b>
-            <?php if($row_post['name'] === $_SESSION['login_name']){ ?><a href="bbs_delete.php?del=<?php echo $row_post['id']; ?>">削除</a><?php } ?>
+            <?php if($row_post['name'] === $_SESSION['login_name']){ ?><a href="bbs_delete.php?del=<?php echo $row_post['id']; ?>" onclick="return confirm('削除しますか？')">削除</a><?php } ?>
             <p class="poster"><?php echo $row_post['message'] ?></p>
             <p class="time">Posted at: <?php echo $row_post['modified'] ?></p>
             <div class="message_reply">
@@ -55,7 +60,7 @@
                 <div class="message_reply_box">        
                     <img src="<?php echo $row_reply['picture'] ?>" width="30px" height="30px" />
                     <b>@<?php echo $row_reply['name'] ?>さん</b>
-                    <?php if($row_reply['name'] === $_SESSION['login_name']){ ?><a href="bbs_delete.php?del=<?php echo $row_reply['id']; ?>">削除</a><?php } ?>
+                    <?php if($row_reply['name'] === $_SESSION['login_name']){ ?><a href="bbs_delete.php?del=<?php echo $row_reply['id']; ?>" onclick="return confirm('削除しますか？')">削除</a><?php } ?>
                     <p class="poster"><?php echo $row_reply['message'] ?></p>
                     <p class="time">Posted at: <?php echo $row_reply['modified'] ?></p>
                 </div>
@@ -70,5 +75,23 @@
             </div>
         </div>
         <?php } ?>
+        <div class="page">
+            <?php
+            $next_num = $p+1;
+            $prev_num = $p-1;
+            $total_page = ($count / $limit) + 1;
+
+            if($p > 0){
+                echo '<a href="index.php?p=', $prev_num, '">＜＜ 前へ</a>','</td>';
+            } else {
+                echo '最新';
+            }
+            if($total_page - 1 >= $p){
+                echo '<a href="index.php?p=', $next_num, '">次へ ＞＞</a>','</td>';
+            } else {
+                echo '末尾';
+            }
+            ?>
+        </div>
     </body>
 </html>
