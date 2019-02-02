@@ -123,3 +123,12 @@ img{
     clear: both;
     margin-left: 60px;
 }
+.page{
+    width: 70%;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 10px;
+}
+.page a{
+    margin: 0 10px;
+}
